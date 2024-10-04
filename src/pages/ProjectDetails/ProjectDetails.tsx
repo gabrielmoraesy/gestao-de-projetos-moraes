@@ -170,7 +170,7 @@ export const ProjectDetails = () => {
                   modalIsOpen={modalIsOpen}
                   closeModal={closeModal}
                   textTitle="Ajuda"
-                  textDescription="Clique encima das tarefas para ver mais detalhes sobre as mesmas"
+                  textDescription="Clique em cima das tarefas para ver mais detalhes sobre as mesmas"
                 />
 
                 <ProjectDetailsBarTask>
