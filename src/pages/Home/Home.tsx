@@ -39,6 +39,8 @@ export const Home = () => {
     (rootReducer: RootState) => rootReducer.projectsReducer
   );
 
+  console.log("projectsAllCurrent", projectsAllCurrent)
+
   return (
     <HomeContainer className={isDarkMode ? "darkMode" : ""}>
       <HomeContent>

@@ -52,6 +52,7 @@ export const Dashboard = () => {
     uid
   );
 
+
   const email = user?.email;
   const { projects, loading } = useFetchProjects(undefined, undefined, email!);
 
@@ -85,6 +86,8 @@ export const Dashboard = () => {
   const { projectsUidProjects, projectsEmailProjects } = useSelector(
     (rootReducer: RootState) => rootReducer.projectsReducer
   );
+
+  console.log("projectsUidProjects", projectsUidProjects)
 
   return (
     <DashboardContainer className={isDarkMode ? "darkMode" : ""}>
