@@ -28,13 +28,6 @@ import { useTheme } from "../../contexts/themeContext";
 // Interfaces
 import { Task } from "../../interfaces/Task";
 
-// Redux
-import { useSelector } from "react-redux/es/hooks/useSelector";
-
-interface RootState {
-  projectReducer: any;
-}
-
 export const TaskDetails = () => {
   const { isDarkMode } = useTheme();
   const navigate = useNavigate();
@@ -47,18 +40,14 @@ export const TaskDetails = () => {
   const { deleteTask } = useDeleteTask();
   const { checkTask } = useCheckTask();
 
-  const { projectCurrent } = useSelector(
-    (rootReducer: RootState) => rootReducer.projectReducer
-  );
-
   useEffect(() => {
-    const foundTask = projectCurrent?.tasks.find(
+    const foundTask = project?.tasks.find(
       (task: Task) => task.id === parseInt(idTask!)
     );
     if (foundTask) {
       setTask(foundTask);
     }
-  }, [idProject, idTask, projectCurrent]);
+  }, [idProject, idTask, project?.tasks]);
 
   const handleCheckTask = async () => {
     await checkTask(idProject!, parseInt(idTask!));
@@ -76,7 +65,7 @@ export const TaskDetails = () => {
           <>
             <TaskDetailsBar>
               <TaskDetailsTitle>
-                Projeto: {projectCurrent?.name} | Tarefa: {task?.name}
+                Projeto: {project?.name} | Tarefa: {task?.name}
               </TaskDetailsTitle>
               <TaskDetailsBarActions>
                 <CheckCircle

@@ -2,20 +2,15 @@ import { Task } from "../../interfaces/Task";
 import { db } from "../../services/firebase";
 import { doc, updateDoc, getDoc } from "firebase/firestore";
 
-// Redux
-import { useDispatch } from "react-redux/es/exports";
-
-// Redux Actions
-import { changeProject } from "../../redux/project/actions";
-
-// Interface
-import { Project } from "../../interfaces/Project";
+import { useState } from "react";
 
 export const useDeleteTask = () => {
-  const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const deleteTask = async (projectId: string, taskId: number) => {
     try {
+      setLoading(true)
       const projectRef = doc(db, "projects", projectId);
       const projectDoc = await getDoc(projectRef);
 
@@ -23,17 +18,16 @@ export const useDeleteTask = () => {
         const updatedTasks = projectDoc
           .data()
           .tasks.filter((task: Task) => task.id !== taskId);
+
         await updateDoc(projectRef, { tasks: updatedTasks });
 
-        const projectCurrent = await getDoc(projectRef);
-        dispatch(changeProject(projectCurrent.data() as Project));
-      } else {
-        console.error("Projeto não encontrado.");
       }
-    } catch (error) {
-      console.error("Erro ao excluir a tarefa:", error);
+    } catch (e) {
+      setError("Ocorreu um erro ao excluir a tarefa.");
+    } finally {
+      setLoading(false)
     }
   };
 
-  return { deleteTask };
+  return { deleteTask, loading, error };
 };

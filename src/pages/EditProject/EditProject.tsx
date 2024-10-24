@@ -19,18 +19,11 @@ import { useNavigate, useParams, Link } from "react-router-dom";
 import { useFetchProject } from "../../hooks/Projects/useFetchProject";
 import { useUpdateProject } from "../../hooks/Projects/useUpdateProject";
 
-// Redux
-import { useSelector } from "react-redux/es/hooks/useSelector";
-
 // Context
 import { useTheme } from "../../contexts/themeContext";
 
 // Icons
 import { ArrowBendUpLeft } from "phosphor-react";
-
-interface RootState {
-  projectReducer: any;
-}
 
 export const EditProject = () => {
   const { isDarkMode } = useTheme();
@@ -91,10 +84,6 @@ export const EditProject = () => {
 
     navigate(`/dashboard`);
   };
-
-  const { projectCurrent } = useSelector(
-    (rootReducer: RootState) => rootReducer.projectReducer
-  );
 
   return (
     <EditProjectContainer className={isDarkMode ? "darkMode" : ""}>

@@ -30,9 +30,6 @@ import { useParams } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 
-// Redux
-import { useSelector } from "react-redux/es/hooks/useSelector";
-
 // Components
 import { PopUp } from "../../components/PopUp/index";
 
@@ -59,10 +56,6 @@ import { useCheckTask } from "../../hooks/Tasks/useCheckTask";
 import { useUser } from "../../contexts/userContext";
 import { useTheme } from "../../contexts/themeContext";
 import { Task } from "../../interfaces/Task";
-
-interface RootState {
-  projectReducer: any;
-}
 
 export const ProjectDetails = () => {
   const { isDarkMode } = useTheme();
@@ -134,10 +127,6 @@ export const ProjectDetails = () => {
     setModalIsOpen(false);
   };
 
-  const { projectCurrent } = useSelector(
-    (rootReducer: RootState) => rootReducer.projectReducer
-  );
-
   return (
     <ProjectDetailsContainer className={isDarkMode ? "darkMode" : ""}>
       <ProjectDetailsContent>
@@ -164,7 +153,7 @@ export const ProjectDetails = () => {
             </ProjectDetailsParagraph>
 
             {project?.members.includes(user?.email || "") ||
-            user?.uid == project?.uid ? (
+              user?.uid === project?.uid ? (
               <>
                 <PopUp
                   modalIsOpen={modalIsOpen}
@@ -200,12 +189,12 @@ export const ProjectDetails = () => {
                 <ProjectDetailsStatistics>
                   <ProjectDetailsParagraphStatistics>
                     Tarefas Criadas |{" "}
-                    <SpanTask>{projectCurrent?.tasks.length}</SpanTask>
+                    <SpanTask>{project?.tasks.length}</SpanTask>
                   </ProjectDetailsParagraphStatistics>
                   <ProjectDetailsParagraphStatistics>
                     Tarefas Pendentes |{" "}
                     <SpanTask>
-                      {projectCurrent?.tasks.reduce(
+                      {project?.tasks.reduce(
                         (acc: number, task: Task) => {
                           if (!task.completed) {
                             acc++;
@@ -219,7 +208,7 @@ export const ProjectDetails = () => {
                   <ProjectDetailsParagraphStatistics>
                     Tarefas Concluídas |{" "}
                     <SpanTask>
-                      {projectCurrent?.tasks.reduce(
+                      {project?.tasks.reduce(
                         (acc: number, task: Task) => {
                           if (task.completed) {
                             acc++;
@@ -254,7 +243,7 @@ export const ProjectDetails = () => {
                       <ProjectDetailsOption value="">
                         Selecione um colaborador para atribuir a tarefa a ele(a)
                       </ProjectDetailsOption>
-                      {projectCurrent?.members.map((colaborador: any) => (
+                      {project?.members.map((colaborador: any) => (
                         <ProjectDetailsOption key={colaborador}>
                           {colaborador}
                         </ProjectDetailsOption>
@@ -272,7 +261,7 @@ export const ProjectDetails = () => {
                     </ProjectDetailsButton>
                   </ProjectDetailsTaskForm>
                   <ProjectDetailsTasksAll>
-                    {projectCurrent?.tasks.map((task: Task) => (
+                    {project?.tasks.map((task: Task) => (
                       <ProjectDetailsTask
                         key={task.id}
                         className={isDarkMode ? "taskDark" : ""}

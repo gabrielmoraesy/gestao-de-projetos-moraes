@@ -15,12 +15,6 @@ import {
 import { FormEvent, useEffect, useState } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 
-// Redux
-import { useDispatch } from "react-redux/es/exports";
-
-// Redux Actions
-import { changeProject } from "../../redux/project/actions";
-
 // Hooks
 import { useFetchProject } from "../../hooks/Projects/useFetchProject";
 
@@ -32,7 +26,6 @@ import { ArrowBendUpLeft } from "phosphor-react";
 import { useUpdateTask } from "../../hooks/Tasks/useUpdateTask";
 
 export const EditTask = () => {
-  const dispatch = useDispatch();
   const { isDarkMode } = useTheme();
   const { idProject, idTask } = useParams();
   const navigate = useNavigate();
@@ -49,7 +42,7 @@ export const EditTask = () => {
   useEffect(() => {
     if (project) {
       const taskFound = project.tasks.find((task) => {
-        if (task.id == parseInt(idTask!)) {
+        if (task.id === parseInt(idTask!)) {
           return task;
         }
       });
@@ -58,7 +51,7 @@ export const EditTask = () => {
       setDescription(taskFound?.description!);
       setAssignedTask(taskFound?.assignedTo!);
     }
-  }, [project]);
+  }, [idTask, project]);
 
   const handleSubmitEditTask = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();

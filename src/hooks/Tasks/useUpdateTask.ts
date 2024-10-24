@@ -3,17 +3,9 @@ import { Task } from "../../interfaces/Task";
 import { db } from "../../services/firebase";
 import { doc, updateDoc, getDoc } from "firebase/firestore";
 
-// Redux
-import { useDispatch } from "react-redux/es/exports";
-
-// Redux Actions
-import { changeProject } from "../../redux/project/actions";
-
-// Interface
-import { Project } from "../../interfaces/Project";
-
 export const useUpdateTask = () => {
-  const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const updateTask = async (
     projectId: string,
@@ -23,12 +15,13 @@ export const useUpdateTask = () => {
     assignedTo: string
   ) => {
     try {
+      setLoading(true)
       const projectRef = doc(db, "projects", projectId);
       const projectDoc = await getDoc(projectRef);
 
       if (projectDoc.exists()) {
         const updatedTasks = projectDoc.data().tasks.map((task: Task) => {
-          if (task.id == taskId) {
+          if (task.id === taskId) {
             return { ...task, name, description, assignedTo };
           } else {
             return task;
@@ -36,16 +29,13 @@ export const useUpdateTask = () => {
         });
 
         await updateDoc(projectRef, { tasks: updatedTasks });
-
-        const projectCurrent = await getDoc(projectRef);
-        dispatch(changeProject(projectCurrent.data() as Project));
-      } else {
-        console.error("Projeto não encontrado.");
       }
-    } catch (error) {
-      console.error("Erro ao editar a tarefa:", error);
+    } catch (e) {
+      setError("Ocorreu um erro ao editar a tarefa.");
+    } finally {
+      setLoading(false)
     }
   };
 
-  return { updateTask };
+  return { updateTask, loading, error };
 };

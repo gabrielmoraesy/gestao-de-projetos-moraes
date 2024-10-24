@@ -4,6 +4,7 @@ import {
   HomeContent,
   HomeInputSearch,
   HomeSearch,
+  HomeLoading,
   HomeTitle,
   HomeProjects,
   HomeProject,
@@ -14,7 +15,7 @@ import {
 } from "./Home.styles";
 
 // React
-import { useState } from "react";
+import { Fragment, useState } from "react";
 
 // Context
 import { useTheme } from "../../contexts/themeContext";
@@ -22,24 +23,12 @@ import { useTheme } from "../../contexts/themeContext";
 // Hooks
 import { useFetchProjects } from "../../hooks/Projects/useFetchProjects";
 
-// Redux
-import { useSelector } from "react-redux/es/hooks/useSelector";
-
-interface RootState {
-  projectsReducer: any;
-}
-
 export const Home = () => {
   const { isDarkMode } = useTheme();
   const [searchTitle, setSearchTitle] = useState("");
 
-  const { loading } = useFetchProjects(searchTitle, undefined);
-
-  const { projectsAllCurrent } = useSelector(
-    (rootReducer: RootState) => rootReducer.projectsReducer
-  );
-
-  console.log("projectsAllCurrent", projectsAllCurrent)
+  const { projects, loading } = useFetchProjects(searchTitle);
+  console.log("projects", projects)
 
   return (
     <HomeContainer className={isDarkMode ? "darkMode" : ""}>
@@ -53,39 +42,53 @@ export const Home = () => {
           />
         </HomeSearch>
 
-        {!loading ? (
-          <>
-            {projectsAllCurrent.length >= 1 ? (
-              <>
-                <HomeProjects>
-                  {projectsAllCurrent.map((project: any) => (
-                    <HomeProject
-                      className={isDarkMode ? "cardDark" : "cardLight"}
-                      key={project.id}
-                    >
-                      <HomeProjectTitle>{project.data.name}</HomeProjectTitle>
-                      <HomeParagraph>{project.data.description}</HomeParagraph>
-                      <HomeParagraph>
-                        Tecnologias: {project.data.technologies.join(", ")}
-                      </HomeParagraph>
+        {loading && <HomeLoading>Carregando...</HomeLoading>}
 
-                      <HomeLink to={`/projects/${project.id}`}>
-                        Ver mais
-                      </HomeLink>
-                    </HomeProject>
-                  ))}
-                </HomeProjects>
-              </>
-            ) : (
-              <HomeNoProjects>
-                <HomeParagraph>Não existem projetos em exibição.</HomeParagraph>
-              </HomeNoProjects>
-            )}
-          </>
-        ) : (
-          ""
-        )}
+        {projects && !loading &&
+          <HomeProjects>
+            {projects.projectsSearch ? projects.projectsSearch!.map((project: any) => (
+              <HomeProject
+                className={isDarkMode ? "cardDark" : "cardLight"}
+                key={project.id}
+              >
+                <HomeProjectTitle>{project.data.name}</HomeProjectTitle>
+                <HomeParagraph>{project.data.description}</HomeParagraph>
+                <HomeParagraph>
+                  Tecnologias: {project.data.technologies.join(", ")}
+                </HomeParagraph>
+
+                <HomeLink to={`/projects/${project.id}`}>
+                  Ver mais
+                </HomeLink>
+              </HomeProject>
+            )) :
+              <Fragment>
+                {projects.projectsAll!.map((project: any) => (
+                  <HomeProject
+                    className={isDarkMode ? "cardDark" : "cardLight"}
+                    key={project.id}
+                  >
+                    <HomeProjectTitle>{project.data.name}</HomeProjectTitle>
+                    <HomeParagraph>{project.data.description}</HomeParagraph>
+                    <HomeParagraph>
+                      Tecnologias: {project.data.technologies.join(", ")}
+                    </HomeParagraph>
+
+                    <HomeLink to={`/projects/${project.id}`}>
+                      Ver mais
+                    </HomeLink>
+                  </HomeProject>
+                ))}
+              </Fragment>}
+          </HomeProjects>
+        }
+
+        {!projects && !loading &&
+          <HomeNoProjects>
+            <HomeParagraph>Não existem projetos em exibição.</HomeParagraph>
+          </HomeNoProjects>
+        }
       </HomeContent>
-    </HomeContainer>
+    </HomeContainer >
   );
 };

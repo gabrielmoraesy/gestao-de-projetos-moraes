@@ -1,17 +1,10 @@
 // React
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 // Firebase
 import { db } from "../../services/firebase";
 import { collection, doc, getDoc } from "firebase/firestore";
 import { Task } from "../../interfaces/Task";
-
-// Redux
-import { useDispatch } from "react-redux/es/exports";
-
-// Redux Actions
-import { changeProject } from "../../redux/project/actions";
-import { Project } from "../../interfaces/Project";
 
 interface FirestoreDocument {
   name: string;
@@ -32,16 +25,11 @@ interface UseFetchDocumentResult {
 }
 
 export const useFetchProject = (id?: string): UseFetchDocumentResult => {
-  const dispatch = useDispatch();
   const [project, setProject] = useState<FirestoreDocument | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchProject();
-  }, [id]);
-
-  const fetchProject = async () => {
+  const fetchProject = useCallback(async () => {
     setLoading(true);
     setError(null);
 
@@ -51,18 +39,18 @@ export const useFetchProject = (id?: string): UseFetchDocumentResult => {
       const docRef = doc(collectionRef, id);
       const docSnap = await getDoc(docRef);
 
-      if (docSnap.exists()) {
-        setProject(docSnap.data() as FirestoreDocument);
-        dispatch(changeProject(docSnap.data() as Project));
-      } else {
-        setError("Projeto não encontrado");
-      }
+      setProject(docSnap.data() as FirestoreDocument);
     } catch (e) {
       setError("Ocorreu um erro ao buscar o projeto");
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
+
+  useEffect(() => {
+    fetchProject();
+  }, [fetchProject, id]);
+
 
   return { project, loading, error };
 };

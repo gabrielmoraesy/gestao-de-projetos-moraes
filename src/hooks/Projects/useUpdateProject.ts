@@ -4,16 +4,7 @@ import { useState } from "react";
 // Firebase
 import { db } from "../../services/firebase";
 import { updateDoc, doc } from "firebase/firestore";
-import { collection, query, orderBy, getDocs } from "firebase/firestore";
-
-// Hooks
-import { useFetchProjects } from "./useFetchProjects";
-
-// Redux
-import { useDispatch } from "react-redux/es/exports";
-
-// Redux Actions
-import { changeAllProjects } from "../../redux/projects/actions";
+// import { collection, query, orderBy, getDocs } from "firebase/firestore";
 
 interface FirestoreDocument {
   name: string;
@@ -23,16 +14,16 @@ interface FirestoreDocument {
 }
 
 export const useUpdateProject = () => {
-  const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const updateProject = async (uid: string, projectData: FirestoreDocument) => {
-    setLoading(true);
-
-    let q;
-    const collectionRef = collection(db, "projects");
+    // let q;
+    // const collectionRef = collection(db, "projects");
 
     try {
+      setLoading(true);
+
       const docRef = doc(db, "projects", uid);
 
       const updatedData = {
@@ -44,23 +35,23 @@ export const useUpdateProject = () => {
 
       await updateDoc(docRef, updatedData);
 
-      q = query(collectionRef, orderBy("createdAt", "desc"));
+      // q = query(collectionRef, orderBy("createdAt", "desc"));
 
-      const querySnapshot = await getDocs(q);
-      dispatch(
-        changeAllProjects(
-          querySnapshot.docs.map((doc) => ({
-            id: doc.id,
-            data: doc.data(),
-          }))
-        )
-      );
+      // const querySnapshot = await getDocs(q);
+      // dispatch(
+      //   changeAllProjects(
+      //     querySnapshot.docs.map((doc) => ({
+      //       id: doc.id,
+      //       data: doc.data(),
+      //     }))
+      //   )
+      // );
     } catch (error) {
-      console.log(error);
+      setError("Ocorreu um erro ao editar este projeto.")
     } finally {
       setLoading(false);
     }
   };
 
-  return { updateProject, loading };
+  return { updateProject, loading, error };
 };

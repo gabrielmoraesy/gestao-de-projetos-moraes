@@ -35,6 +35,11 @@ export const HomeInputSearch = styled.input`
   }
 `;
 
+export const HomeLoading = styled.p`
+  font-size: 18px;
+  margin: 1rem 2rem;
+`;
+
 export const HomeProjects = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 2fr));

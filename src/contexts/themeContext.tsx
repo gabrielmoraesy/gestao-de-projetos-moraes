@@ -12,15 +12,15 @@ interface ThemeContextValue {
   toggleTheme: () => void;
 }
 
-const ThemeContext = createContext<ThemeContextValue>({
-  isDarkMode: false,
-  toggleTheme: () => {},
-});
-
 interface ThemeProps {
   children: ReactNode;
   theme: { mode: string };
 }
+
+const ThemeContext = createContext<ThemeContextValue>({
+  isDarkMode: false,
+  toggleTheme: () => { },
+});
 
 export function ThemeProvider({ children }: ThemeProps) {
   const [isDarkMode, setIsDarkMode] = useState(false);
