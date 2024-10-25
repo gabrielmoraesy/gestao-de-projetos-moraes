@@ -18,13 +18,7 @@ interface FirestoreDocument {
   createdAt: Date;
 }
 
-interface UseFetchDocumentResult {
-  project: FirestoreDocument | null;
-  loading: boolean;
-  error: string | null;
-}
-
-export const useFetchProject = (id?: string): UseFetchDocumentResult => {
+export const useFetchProject = (id?: string) => {
   const [project, setProject] = useState<FirestoreDocument | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -51,6 +45,5 @@ export const useFetchProject = (id?: string): UseFetchDocumentResult => {
     fetchProject();
   }, [fetchProject, id]);
 
-
-  return { project, loading, error };
+  return { project, setProject, loading, error };
 };

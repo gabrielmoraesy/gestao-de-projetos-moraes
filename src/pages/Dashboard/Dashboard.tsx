@@ -34,6 +34,7 @@ import { useDeleteProject } from "../../hooks/Projects/useDeleteProject";
 
 // Icons
 import { ArrowsInLineVertical, ArrowsOutLineVertical } from "phosphor-react";
+import { LoadingGlobal } from "../Home/Home.styles";
 
 export const Dashboard = () => {
   const { user } = useUser();
@@ -45,8 +46,10 @@ export const Dashboard = () => {
 
   const userEmail = user ? user.email : undefined
 
-  const { projects, loading } = useFetchProjects(user!.uid, userEmail!);
+  const { projects, setProjects, loading } = useFetchProjects(undefined, user!.uid, userEmail!);
   const { deleteProject } = useDeleteProject();
+
+  console.log("projectsUID", projects.projectsUid)
 
   const openModal = (action: string) => {
     setModalIsOpen(true);
@@ -55,7 +58,46 @@ export const Dashboard = () => {
     );
   };
 
-  // console.log("projectsUid", projects?.projectsUid)
+  const renderButtonsOpenAndCloseTable = (table: string) => {
+    if (table === 'myProjects') {
+      return myProjectsOpenAndClose ? (
+        <ArrowsInLineVertical
+          size={32}
+          onClick={() => setMyProjectsOpenAndClose(false)}
+        />
+      ) : (
+        <ArrowsOutLineVertical
+          size={32}
+          onClick={() => setMyProjectsOpenAndClose(true)}
+        />
+      )
+    }
+
+    if (table === 'projects') {
+      return projectsOpenAndClose ? (
+        <ArrowsInLineVertical
+          size={32}
+          onClick={() => setProjectsOpenAndClose(false)}
+        />
+      ) : (
+        <ArrowsOutLineVertical
+          size={32}
+          onClick={() => setProjectsOpenAndClose(true)}
+        />
+      )
+    }
+  }
+
+  const handleDeleteProject = async (projectId: string) => {
+    const deleteProjectFromArray = projects.projectsUid?.filter(project => project.id !== projectId)
+
+    setProjects((prevProjects) => ({
+      ...prevProjects,
+      projectsUid: deleteProjectFromArray
+    }));
+
+    await deleteProject(projectId)
+  }
 
   return (
     <DashboardContainer className={isDarkMode ? "darkMode" : ""}>
@@ -74,23 +116,14 @@ export const Dashboard = () => {
           <DashboardSpan>Ações</DashboardSpan>
         </DashboardTable>
 
-
         <DashboardDivision>
-          Projetos que você criou{" "}
-          {myProjectsOpenAndClose ? (
-            <ArrowsInLineVertical
-              size={32}
-              onClick={() => setMyProjectsOpenAndClose(false)}
-            />
-          ) : (
-            <ArrowsOutLineVertical
-              size={32}
-              onClick={() => setMyProjectsOpenAndClose(true)}
-            />
-          )}
+          Projetos que você criou
+          {renderButtonsOpenAndCloseTable("myProjects")}
         </DashboardDivision>
 
-        {projects!.projectsUid!.map((project: any) => (
+        {loading && <LoadingGlobal>Carregando...</LoadingGlobal>}
+
+        {projects.projectsUid && projects.projectsUid.map((project: any) => (
           <DashboardColumnMyProjects
             className={myProjectsOpenAndClose ? "flex" : "none"}
           >
@@ -120,7 +153,7 @@ export const Dashboard = () => {
                   Editar
                 </Link>
                 <DashboardActionsButton
-                  onClick={() => deleteProject(project.id)}
+                  onClick={() => handleDeleteProject(project.id)}
                   className={
                     isDarkMode
                       ? "btn btn-outline btn-danger linkDarkRemove"
@@ -135,101 +168,90 @@ export const Dashboard = () => {
         ))
         }
 
-        {/* <DashboardColumnMyProjects
-                  className={myProjectsOpenAndClose ? "flex" : "none"}
-                >
-                  <DashboardNoProjects>
-                    <DashboardParagraphNoProjects>
-                      Você não possui nenhum projeto criado
-                    </DashboardParagraphNoProjects>
+        {projects.projectsUid && projects.projectsUid.length === 0 &&
+          <DashboardColumnMyProjects
+            className={myProjectsOpenAndClose ? "flex" : "none"}
+          >
+            <DashboardNoProjects>
+              <DashboardParagraphNoProjects>
+                Você não possui nenhum projeto criado
+              </DashboardParagraphNoProjects>
 
-                    <Link to="/projects/create" className="btn">
-                      Criar projeto
-                    </Link>
-                  </DashboardNoProjects>
-                </DashboardColumnMyProjects> */}
+              <Link to="/projects/create" className="btn">
+                Criar projeto
+              </Link>
+            </DashboardNoProjects>
+          </DashboardColumnMyProjects>
+        }
 
-        {!loading && (
-          <>
-            <DashboardDivision>
-              Projetos que você participa{" "}
-              {projectsOpenAndClose ? (
-                <ArrowsInLineVertical
-                  size={32}
-                  onClick={() => setProjectsOpenAndClose(false)}
-                />
-              ) : (
-                <ArrowsOutLineVertical
-                  size={32}
-                  onClick={() => setProjectsOpenAndClose(true)
+        <DashboardDivision>
+          Projetos que você participa
+          {renderButtonsOpenAndCloseTable("projects")}
+        </DashboardDivision>
+
+        {loading && <LoadingGlobal>Carregando...</LoadingGlobal>}
+
+        {projects.projectsEmail && projects.projectsEmail.map((project: any) => (
+          <DashboardColumnProjects
+            className={projectsOpenAndClose ? "flex" : "none"}
+          >
+            <DashboardRow key={project.id}>
+              <DashboardParagraph>
+                {project.data.name}
+              </DashboardParagraph>
+              <DashboardActions>
+                <Link
+                  to={`/projects/${project.id}`}
+                  className={
+                    isDarkMode
+                      ? "btn btn-outline linkDark"
+                      : "btn btn-outline"
                   }
-                />
-              )}
-            </DashboardDivision>
-            {projects!.projectsEmail!.length > 0 ? (
-              projects!.projectsEmail!.map((project: any) => (
-                <DashboardColumnProjects
-                  className={projectsOpenAndClose ? "flex" : "none"}
                 >
-                  <DashboardRow key={project.id}>
-                    <DashboardParagraph>
-                      {project.data.name}
-                    </DashboardParagraph>
-                    <DashboardActions>
-                      <Link
-                        to={`/projects/${project.id}`}
-                        className={
-                          isDarkMode
-                            ? "btn btn-outline linkDark"
-                            : "btn btn-outline"
-                        }
-                      >
-                        Ver
-                      </Link>
-                      <Link
-                        to=""
-                        onClick={() => openModal("editar")}
-                        className={
-                          isDarkMode
-                            ? "btn btn-outline linkDark"
-                            : "btn btn-outline"
-                        }
-                      >
-                        Editar
-                      </Link>
-                      <DashboardActionsButton
-                        onClick={() => openModal("excluir")}
-                        className={
-                          isDarkMode
-                            ? "btn btn-outline btn-danger linkDarkRemove"
-                            : "btn btn-outline btn-danger"
-                        }
-                      >
-                        Excluir
-                      </DashboardActionsButton>
-                    </DashboardActions>
-                  </DashboardRow>
-                </DashboardColumnProjects>
-              ))
-            ) : (
-              <DashboardColumnProjects
-                className={projectsOpenAndClose ? "flex" : "none"}
-              >
-                <DashboardNoProjects>
-                  <DashboardParagraphNoProjects>
-                    Você não participa de nenhum outro projeto, com exceção
-                    dos que você criou
-                  </DashboardParagraphNoProjects>
+                  Ver
+                </Link>
+                <Link
+                  to=""
+                  onClick={() => openModal("editar")}
+                  className={
+                    isDarkMode
+                      ? "btn btn-outline linkDark"
+                      : "btn btn-outline"
+                  }
+                >
+                  Editar
+                </Link>
+                <DashboardActionsButton
+                  onClick={() => openModal("excluir")}
+                  className={
+                    isDarkMode
+                      ? "btn btn-outline btn-danger linkDarkRemove"
+                      : "btn btn-outline btn-danger"
+                  }
+                >
+                  Excluir
+                </DashboardActionsButton>
+              </DashboardActions>
+            </DashboardRow>
+          </DashboardColumnProjects>
+        ))
+        }
 
-                  <Link to="/projects/create" className="btn">
-                    Criar projeto
-                  </Link>
-                </DashboardNoProjects>
-              </DashboardColumnProjects>
-            )}
-          </>
-        )}
+        {projects.projectsEmail && projects.projectsEmail.length === 0 &&
+          <DashboardColumnProjects
+            className={projectsOpenAndClose ? "flex" : "none"}
+          >
+            <DashboardNoProjects>
+              <DashboardParagraphNoProjects>
+                Você não participa de nenhum projeto
+              </DashboardParagraphNoProjects>
 
+              <Link to="/projects/create" className="btn">
+                Criar projeto
+              </Link>
+            </DashboardNoProjects>
+          </DashboardColumnProjects>
+        }
       </DashboardContent >
     </DashboardContainer >
   );

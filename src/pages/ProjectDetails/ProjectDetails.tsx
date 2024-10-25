@@ -28,7 +28,7 @@ import {
 // React
 import { useParams } from "react-router-dom";
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 // Components
 import { PopUp } from "../../components/PopUp/index";
@@ -60,7 +60,7 @@ import { Task } from "../../interfaces/Task";
 export const ProjectDetails = () => {
   const { isDarkMode } = useTheme();
   const { id } = useParams();
-  const { project, loading } = useFetchProject(id);
+  const { project, setProject, loading } = useFetchProject(id);
 
   const [nameTask, setNameTask] = useState("");
   const [descTask, setDescTask] = useState("");
@@ -126,6 +126,12 @@ export const ProjectDetails = () => {
   const closeModal = () => {
     setModalIsOpen(false);
   };
+
+  console.log(project?.tasks)
+
+  useEffect(() => {
+
+  })
 
   return (
     <ProjectDetailsContainer className={isDarkMode ? "darkMode" : ""}>

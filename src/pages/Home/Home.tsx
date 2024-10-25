@@ -4,7 +4,7 @@ import {
   HomeContent,
   HomeInputSearch,
   HomeSearch,
-  HomeLoading,
+  LoadingGlobal,
   HomeTitle,
   HomeProjects,
   HomeProject,
@@ -28,7 +28,6 @@ export const Home = () => {
   const [searchTitle, setSearchTitle] = useState("");
 
   const { projects, loading } = useFetchProjects(searchTitle);
-  console.log("projects", projects)
 
   return (
     <HomeContainer className={isDarkMode ? "darkMode" : ""}>
@@ -42,7 +41,7 @@ export const Home = () => {
           />
         </HomeSearch>
 
-        {loading && <HomeLoading>Carregando...</HomeLoading>}
+        {loading && <LoadingGlobal>Carregando...</LoadingGlobal>}
 
         {projects && !loading &&
           <HomeProjects>
@@ -63,7 +62,7 @@ export const Home = () => {
               </HomeProject>
             )) :
               <Fragment>
-                {projects.projectsAll!.map((project: any) => (
+                {projects.projectsAll && projects.projectsAll!.map((project: any) => (
                   <HomeProject
                     className={isDarkMode ? "cardDark" : "cardLight"}
                     key={project.id}

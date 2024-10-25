@@ -20,11 +20,9 @@ interface IProjects {
 export const useFetchProjects = (
   search?: string, uid?: string, email?: string
 ) => {
-  const [projects, setProjects] = useState<IProjects | null>(null);
+  const [projects, setProjects] = useState<IProjects>({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  console.log("search, uid, email", search, uid, email)
 
   const fetchProjects = useCallback(async () => {
     setLoading(true);
@@ -41,9 +39,10 @@ export const useFetchProjects = (
           data: doc.data(),
         }));
 
-      setProjects({
+      setProjects((prevProjects) => ({
+        ...prevProjects,
         projectsAll
-      });
+      }));
 
       if (search) {
         const querySearch = query(collectionRef, orderBy("createdAt", "desc"));
@@ -58,26 +57,17 @@ export const useFetchProjects = (
             data: doc.data(),
           }));
 
-        setProjects({
-          ...projects,
+        setProjects((prevProjects) => ({
+          ...prevProjects,
           projectsSearch
-        });
+        }));
 
         return;
       }
 
       if (uid && email) {
-        const queryUid = query(
-          collectionRef,
-          where("uid", "==", uid),
-          orderBy("createdAt", "desc")
-        );
-
-        const queryEmail = query(
-          collectionRef,
-          where("members", "array-contains", email),
-          orderBy("createdAt", "desc")
-        );
+        const queryUid = query(collectionRef, where("uid", "==", uid));
+        const queryEmail = query(collectionRef, where("members", "array-contains", email));
 
         const querySnapshotUid = await getDocs(queryUid);
         const querySnapshotEmail = await getDocs(queryEmail);
@@ -94,10 +84,11 @@ export const useFetchProjects = (
           data: doc.data(),
         }))
 
-        setProjects({
+        setProjects((prevProjects) => ({
+          ...prevProjects,
           projectsEmail: projectsEmailWithoutUserLogged,
           projectsUid
-        })
+        }));
 
         return;
       }
@@ -113,5 +104,5 @@ export const useFetchProjects = (
     fetchProjects();
   }, [fetchProjects, search, uid, email]);
 
-  return { projects, loading, error };
+  return { projects, setProjects, loading, error };
 }
