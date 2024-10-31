@@ -2,11 +2,11 @@
 import { useState } from "react";
 
 // Firebase
-import { db } from "../../services/firebase";
 import {
-  collection,
-  addDoc
+  addDoc,
+  collection
 } from "firebase/firestore";
+import { db } from "../../services/firebase";
 
 interface Project {
   name: string;
@@ -24,9 +24,6 @@ const useInsertProject = () => {
   const [error, setError] = useState<string | null>(null);
 
   const insertProject = async (project: Project) => {
-    // let q;
-    // const collectionRef = collection(db, "projects");
-
     try {
       setLoading(true)
       const newProject = { ...project, createdAt: new Date() };
@@ -35,18 +32,6 @@ const useInsertProject = () => {
         collection(db, "projects"),
         newProject
       );
-
-      // q = query(collectionRef, orderBy("createdAt", "desc"));
-
-      // const querySnapshot = await getDocs(q);
-      // dispatchProjects(
-      //   changeAllProjects(
-      //     querySnapshot.docs.map((doc) => ({
-      //       id: doc.id,
-      //       data: doc.data(),
-      //     }))
-      //   )
-      // );
     } catch (error) {
       setError("Ocorreu um erro ao criar projeto.")
     } finally {

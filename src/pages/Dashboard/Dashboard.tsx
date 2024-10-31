@@ -49,8 +49,6 @@ export const Dashboard = () => {
   const { projects, setProjects, loading } = useFetchProjects(undefined, user!.uid, userEmail!);
   const { deleteProject } = useDeleteProject();
 
-  console.log("projectsUID", projects.projectsUid)
-
   const openModal = (action: string) => {
     setModalIsOpen(true);
     setNameDescriptionModal(
@@ -126,6 +124,7 @@ export const Dashboard = () => {
         {projects.projectsUid && projects.projectsUid.map((project: any) => (
           <DashboardColumnMyProjects
             className={myProjectsOpenAndClose ? "flex" : "none"}
+            key={project.id}
           >
             <DashboardRow key={project.id}>
               <DashboardParagraph>
@@ -194,6 +193,7 @@ export const Dashboard = () => {
         {projects.projectsEmail && projects.projectsEmail.map((project: any) => (
           <DashboardColumnProjects
             className={projectsOpenAndClose ? "flex" : "none"}
+            key={project.id}
           >
             <DashboardRow key={project.id}>
               <DashboardParagraph>

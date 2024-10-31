@@ -19,7 +19,7 @@ interface FirestoreDocument {
 }
 
 export const useFetchProject = (id?: string) => {
-  const [project, setProject] = useState<FirestoreDocument | null>(null);
+  const [project, setProject] = useState<FirestoreDocument>();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

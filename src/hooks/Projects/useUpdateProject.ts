@@ -2,9 +2,8 @@
 import { useState } from "react";
 
 // Firebase
+import { doc, updateDoc } from "firebase/firestore";
 import { db } from "../../services/firebase";
-import { updateDoc, doc } from "firebase/firestore";
-// import { collection, query, orderBy, getDocs } from "firebase/firestore";
 
 interface FirestoreDocument {
   name: string;
@@ -18,9 +17,6 @@ export const useUpdateProject = () => {
   const [error, setError] = useState<string | null>(null);
 
   const updateProject = async (uid: string, projectData: FirestoreDocument) => {
-    // let q;
-    // const collectionRef = collection(db, "projects");
-
     try {
       setLoading(true);
 
@@ -34,18 +30,6 @@ export const useUpdateProject = () => {
       };
 
       await updateDoc(docRef, updatedData);
-
-      // q = query(collectionRef, orderBy("createdAt", "desc"));
-
-      // const querySnapshot = await getDocs(q);
-      // dispatch(
-      //   changeAllProjects(
-      //     querySnapshot.docs.map((doc) => ({
-      //       id: doc.id,
-      //       data: doc.data(),
-      //     }))
-      //   )
-      // );
     } catch (error) {
       setError("Ocorreu um erro ao editar este projeto.")
     } finally {

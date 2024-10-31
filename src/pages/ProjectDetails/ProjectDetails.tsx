@@ -58,8 +58,13 @@ import { useTheme } from "../../contexts/themeContext";
 import { Task } from "../../interfaces/Task";
 
 export const ProjectDetails = () => {
+  const { user } = useUser();
   const { isDarkMode } = useTheme();
   const { id } = useParams();
+
+  const { insertTask } = useInsertTask();
+  const { deleteTask } = useDeleteTask();
+  const { checkTask } = useCheckTask();
   const { project, setProject, loading } = useFetchProject(id);
 
   const [nameTask, setNameTask] = useState("");
@@ -71,11 +76,7 @@ export const ProjectDetails = () => {
 
   const [formError, setFormError] = useState("");
 
-  const { insertTask } = useInsertTask();
-  const { deleteTask } = useDeleteTask();
-  const { checkTask } = useCheckTask();
-
-  const { user } = useUser();
+  console.log("project", project)
 
   const addTask = async () => {
     if (!nameTask || !descTask || !assignedTask[0]) {
@@ -101,6 +102,15 @@ export const ProjectDetails = () => {
         setDescTask("");
         setAssignedTask("");
         setFormError("");
+
+        setProject((prevProject) => {
+          if (!prevProject) return prevProject;
+
+          return {
+            ...prevProject,
+            tasks: [...prevProject.tasks, newTask],
+          };
+        });
       }
     } catch (error) {
       console.error("Erro ao inserir a tarefa no banco de dados:", error);
@@ -108,10 +118,35 @@ export const ProjectDetails = () => {
   };
 
   const handleCheckTask = async (projectId: string, taskId: number) => {
+    setProject((prevProject) => {
+      if (!prevProject) return prevProject;
+
+      const updatedTasks = prevProject.tasks.map((task) =>
+        task.id === taskId ? { ...task, completed: !task.completed } : task
+      );
+
+      return {
+        ...prevProject,
+        tasks: updatedTasks,
+      };
+    });
+
     await checkTask(projectId, taskId);
   };
 
+
   const handleDeleteTask = async (projectId: string, taskId: number) => {
+    setProject((prevProject) => {
+      if (!prevProject) return prevProject;
+
+      const updatedTasks = prevProject.tasks.filter(task => task.id !== taskId)
+
+      return {
+        ...prevProject,
+        tasks: updatedTasks,
+      };
+    });
+
     await deleteTask(projectId, taskId);
   };
 
@@ -119,19 +154,9 @@ export const ProjectDetails = () => {
     setTasksOpenAndClose(!tasksOpenAndClose);
   };
 
-  const openModal = () => {
-    setModalIsOpen(true);
-  };
-
   const closeModal = () => {
     setModalIsOpen(false);
   };
-
-  console.log(project?.tasks)
-
-  useEffect(() => {
-
-  })
 
   return (
     <ProjectDetailsContainer className={isDarkMode ? "darkMode" : ""}>
@@ -173,7 +198,7 @@ export const ProjectDetails = () => {
                   <ProjectDetailsBarTaskActions>
                     <Info
                       size={32}
-                      onClick={() => openModal()}
+                      onClick={() => setModalIsOpen(true)}
                       className={isDarkMode ? "darkIcon" : ""}
                     />
                     {tasksOpenAndClose ? (
